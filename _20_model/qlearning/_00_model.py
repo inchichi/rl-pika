@@ -68,7 +68,7 @@ class Qlearning:
         self.update_epsilon()
 
         # Return Transition
-        return transition
+        return transition, state_next_mat
 
     def update(self, transition):
         """================================================================================================

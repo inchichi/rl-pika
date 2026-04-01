@@ -38,11 +38,14 @@ def run(conf):
         # - Run an Episode
         while True:
             # - Get Transition by Action Selection and Environment Run
-            transition = model_train.get_transition(env, state_mat)
+            transition, state_next_mat = model_train.get_transition(env, state_mat)
 
             # - Update Policy by Transition
             model_train.update(transition)
             env = model_train.env
+
+            # - Update State
+            state_mat = state_next_mat
 
             # - Check Terminate Condition
             done = transition[4]
