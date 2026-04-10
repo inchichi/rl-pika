@@ -1,4 +1,5 @@
 # Import Required Internal Libraries
+from _00_environment.constants import BALL_TOUCHING_GROUND_Y_COORD
 from _00_environment.constants import GROUND_HALF_WIDTH
 
 
@@ -19,6 +20,14 @@ def normalize_minmax(value, minimum_value, maximum_value):
     return float(normalized_value)
 
 
+def clip_value(value, minimum_value, maximum_value):
+    if value < minimum_value:
+        return float(minimum_value)
+    if value > maximum_value:
+        return float(maximum_value)
+    return float(value)
+
+
 def select_mat_for_reward(materials):
     """====================================================================================================
     ## Load materials for reward design
@@ -26,6 +35,7 @@ def select_mat_for_reward(materials):
     self_position = materials["self_position"]
     opponent_position = materials["opponent_position"]
     ball_position = materials["ball_position"]
+    ball_velocity = materials.get("ball_velocity", (0.0, 0.0))
     self_action_name = str(materials["self_action_name"])
     opponent_action_name = str(materials["opponent_action_name"])
     rally_total_frames_until_point = float(
@@ -36,9 +46,190 @@ def select_mat_for_reward(materials):
     self_dive_used = int(self_action_name.startswith("dive_"))
     opponent_dive_used = int(opponent_action_name.startswith("dive_"))
     opponent_spike_used = int(opponent_action_name.startswith("spike_"))
+    self_aggressive_attack = int(
+        self_action_name in (
+            "spike_fast_up",
+            "spike_fast_flat",
+            "spike_fast_down",
+            "spike_soft_down",
+        )
+    )
+    self_touched_ball = int(float(materials.get("self_touched_ball", 0.0)) > 0.5)
+    self_dive_missed = int(self_dive_used > 0 and self_touched_ball == 0)
+    expected_landing_x = float(materials.get("expected_landing_x", ball_position[0]))
     match_won = int(materials["match_result"]["won"] > 0.5)
     self_net_distance = abs(self_position[0] - GROUND_HALF_WIDTH)
     opponent_net_distance = abs(opponent_position[0] - GROUND_HALF_WIDTH)
+    ball_to_self_distance = abs(ball_position[0] - self_position[0])
+    ball_to_opponent_distance = abs(ball_position[0] - opponent_position[0])
+    ball_on_self_side = int(float(ball_position[0]) <= float(GROUND_HALF_WIDTH))
+    predicted_self_landing = int(float(expected_landing_x) <= float(GROUND_HALF_WIDTH))
+    landing_delta_x = float(expected_landing_x) - float(self_position[0])
+    landing_delta_abs = abs(landing_delta_x)
+    landing_move_threshold = float(GROUND_HALF_WIDTH) * 0.08
+    ready_wait_threshold = float(GROUND_HALF_WIDTH) * 0.10
+
+    ball_velocity_y = 0.0
+    if isinstance(ball_velocity, (list, tuple)) and len(ball_velocity) >= 2:
+        ball_velocity_y = float(ball_velocity[1])
+
+    self_forward_commit = int(
+        self_action_name in ("forward", "jump_forward", "dive_forward")
+    )
+    self_backward_recover = int(
+        self_action_name in ("backward", "jump_backward", "dive_backward")
+    )
+    self_jump_used = int(
+        self_action_name in ("jump", "jump_forward", "jump_backward")
+    )
+    self_grounded_move = int(self_action_name in ("forward", "backward"))
+    self_backward_jump = int(self_action_name == "jump_backward")
+    self_backward_dive = int(self_action_name == "dive_backward")
+
+    standby_target_x = float(GROUND_HALF_WIDTH) * 0.50
+    intercept_target_x = clip_value(expected_landing_x, 0.0, float(GROUND_HALF_WIDTH))
+    anticipation_weight = 0.0
+    if ball_on_self_side > 0:
+        anticipation_weight = 1.0
+    elif predicted_self_landing > 0:
+        anticipation_weight = 0.72
+    elif opponent_spike_used > 0:
+        anticipation_weight = 0.30
+    else:
+        anticipation_weight = 0.15
+    position_target_x = (
+        (1.0 - anticipation_weight) * standby_target_x
+        + anticipation_weight * intercept_target_x
+    )
+
+    position_error = abs(float(self_position[0]) - float(position_target_x))
+    self_overfront = int(
+        ball_on_self_side < 1 and float(self_position[0]) > float(GROUND_HALF_WIDTH) * 0.78
+    )
+    self_overback = int(
+        ball_on_self_side < 1 and float(self_position[0]) < float(GROUND_HALF_WIDTH) * 0.22
+    )
+    ball_on_opponent_side = int(ball_on_self_side < 1)
+    self_front_zone = int(float(self_position[0]) > float(GROUND_HALF_WIDTH) * 0.75)
+    self_overchase = int(
+        ball_on_opponent_side > 0 and self_front_zone > 0 and self_forward_commit > 0
+    )
+    self_recover = int(
+        ball_on_opponent_side > 0 and self_front_zone > 0 and self_backward_recover > 0
+    )
+    defensive_pressure = int(
+        predicted_self_landing > 0
+        or ball_on_self_side > 0
+        or opponent_spike_used > 0
+    )
+    defensive_touch = int(
+        self_touched_ball > 0
+        and (
+            defensive_pressure > 0
+            or self_dive_used > 0
+            or self_backward_recover > 0
+        )
+    )
+    stable_defense_touch = int(defensive_touch > 0 and self_spike_used < 1)
+    neutral_keep_play_touch = int(
+        self_touched_ball > 0
+        and defensive_pressure < 1
+        and self_spike_used < 1
+        and self_dive_used < 1
+    )
+
+    landing_need_backward = int(
+        predicted_self_landing > 0 and landing_delta_x < -landing_move_threshold
+    )
+    landing_need_forward = int(
+        predicted_self_landing > 0 and landing_delta_x > landing_move_threshold
+    )
+    timely_backward_move = int(landing_need_backward > 0 and self_backward_recover > 0)
+    timely_forward_move = int(landing_need_forward > 0 and self_forward_commit > 0)
+    wrong_way_move = int(
+        (landing_need_backward > 0 and self_forward_commit > 0)
+        or (landing_need_forward > 0 and self_backward_recover > 0)
+    )
+
+    ball_drop_factor = normalize_minmax(
+        float(ball_position[1]),
+        0.0,
+        BALL_TOUCHING_GROUND_Y_COORD,
+    )
+    ball_descend_factor = normalize_minmax(ball_velocity_y, -18.0, 18.0)
+    landing_urgency = clip_value(
+        (0.55 * ball_drop_factor) + (0.45 * ball_descend_factor),
+        0.0,
+        1.0,
+    )
+
+    premature_back_jump = int(
+        self_backward_jump > 0
+        and landing_need_backward < 1
+        and ball_on_self_side < 1
+        and landing_urgency < 0.65
+    )
+    emergency_back_dive = int(
+        self_backward_dive > 0
+        and landing_need_backward > 0
+        and landing_urgency > 0.72
+    )
+    grounded_timed_move = int(
+        self_grounded_move > 0
+        and (
+            (landing_need_backward > 0 and self_action_name == "backward")
+            or (landing_need_forward > 0 and self_action_name == "forward")
+        )
+    )
+    jump_timed_touch = int(
+        self_jump_used > 0
+        and self_touched_ball > 0
+        and predicted_self_landing > 0
+    )
+    premature_jump = int(
+        self_jump_used > 0
+        and self_touched_ball < 1
+        and (
+            (predicted_self_landing < 1 and ball_on_self_side < 1)
+            or landing_urgency < 0.58
+        )
+    )
+    wrong_jump_direction = int(
+        (landing_need_backward > 0 and self_action_name == "jump_forward")
+        or (landing_need_forward > 0 and self_action_name == "jump_backward")
+        or (
+            self_action_name == "jump"
+            and landing_delta_abs > landing_move_threshold
+            and predicted_self_landing > 0
+        )
+    )
+    well_prepared_idle = int(
+        defensive_pressure > 0
+        and self_action_name == "idle"
+        and position_error <= ready_wait_threshold
+        and landing_urgency > 0.42
+    )
+    idle_under_pressure = int(
+        defensive_pressure > 0
+        and self_touched_ball < 1
+        and self_action_name == "idle"
+        and landing_urgency > 0.42
+        and position_error > ready_wait_threshold
+    )
+    reckless_forward_under_pressure = int(
+        defensive_pressure > 0
+        and self_forward_commit > 0
+        and landing_need_backward > 0
+    )
+    attacking_opportunity = int(
+        defensive_pressure < 1
+        and float(ball_position[1]) < float(BALL_TOUCHING_GROUND_Y_COORD) * 0.72
+    )
+    assertive_attack_touch = int(
+        self_touched_ball > 0
+        and self_aggressive_attack > 0
+        and attacking_opportunity > 0
+    )
 
     SELECTED_MATARIALS = {
         "self_position": self_position,
@@ -48,13 +239,48 @@ def select_mat_for_reward(materials):
         "opponent_action_name": opponent_action_name,
         "self_net_distance": self_net_distance,
         "opponent_net_distance": opponent_net_distance,
+        "ball_to_self_distance": ball_to_self_distance,
+        "ball_to_opponent_distance": ball_to_opponent_distance,
         "point_scored": point_scored,
         "point_lost": point_lost,
         "self_spike_used": self_spike_used,
         "self_dive_used": self_dive_used,
+        "self_aggressive_attack": self_aggressive_attack,
+        "self_touched_ball": self_touched_ball,
+        "self_dive_missed": self_dive_missed,
         "opponent_dive_used": opponent_dive_used,
         "opponent_spike_used": opponent_spike_used,
         "match_won": match_won,
+        "ball_on_self_side": ball_on_self_side,
+        "predicted_self_landing": predicted_self_landing,
+        "landing_delta_x": landing_delta_x,
+        "landing_delta_abs": landing_delta_abs,
+        "landing_need_backward": landing_need_backward,
+        "landing_need_forward": landing_need_forward,
+        "timely_backward_move": timely_backward_move,
+        "timely_forward_move": timely_forward_move,
+        "grounded_timed_move": grounded_timed_move,
+        "jump_timed_touch": jump_timed_touch,
+        "premature_jump": premature_jump,
+        "wrong_way_move": wrong_way_move,
+        "wrong_jump_direction": wrong_jump_direction,
+        "landing_urgency": landing_urgency,
+        "premature_back_jump": premature_back_jump,
+        "emergency_back_dive": emergency_back_dive,
+        "position_target_x": position_target_x,
+        "position_error": position_error,
+        "self_overfront": self_overfront,
+        "self_overback": self_overback,
+        "self_overchase": self_overchase,
+        "self_recover": self_recover,
+        "defensive_pressure": defensive_pressure,
+        "defensive_touch": defensive_touch,
+        "stable_defense_touch": stable_defense_touch,
+        "neutral_keep_play_touch": neutral_keep_play_touch,
+        "assertive_attack_touch": assertive_attack_touch,
+        "well_prepared_idle": well_prepared_idle,
+        "idle_under_pressure": idle_under_pressure,
+        "reckless_forward_under_pressure": reckless_forward_under_pressure,
         "rally_total_frames_until_point": rally_total_frames_until_point,
     }
     return SELECTED_MATARIALS
@@ -68,29 +294,133 @@ def calculate_reward(materials):
 
     SCALE_POINT_SCORE_REWARD = 25.0
     SCALE_POINT_LOST_PENALTY = 25.0
-    SCALE_SELF_SPIKE_BONUS = 0.
-    SCALE_SELF_DIVE_BONUS = 0.
-    SCALE_OPPONENT_DIVE_BONUS = 0.
-    SCALE_OPPONENT_SPIKE_PENALTY = 0.
-    SCALE_RALLY_FRAME = 0.
-    SCALE_RALLY_FRAME_MAX = 0.
-    SCALE_MATCH_WIN_BONUS = 30.0
+    SCALE_SELF_TOUCH_BONUS = 0.36
+    SCALE_SELF_SPIKE_BONUS = 0.14
+    SCALE_SELF_DIVE_BONUS = 0.08
+    SCALE_SELF_DIVE_MISS_PENALTY = 0.25
+    SCALE_SELF_OVERCHASE_PENALTY = 0.26
+    SCALE_SELF_RECOVER_BONUS = 0.16
+    SCALE_DEFENSIVE_TOUCH_BONUS = 0.14
+    SCALE_STABLE_DEFENSE_BONUS = 0.06
+    SCALE_NEUTRAL_KEEP_PLAY_PENALTY = 0.04
+    SCALE_ASSERTIVE_ATTACK_BONUS = 0.10
+    SCALE_ANTICIPATION_BACKWARD_BONUS = 0.16
+    SCALE_ANTICIPATION_FORWARD_BONUS = 0.12
+    SCALE_GROUNDED_TIMELY_MOVE_BONUS = 0.10
+    SCALE_JUMP_TIMED_TOUCH_BONUS = 0.06
+    SCALE_WRONG_DIRECTION_PENALTY = 0.14
+    SCALE_PREMATURE_JUMP_PENALTY = 0.10
+    SCALE_WRONG_JUMP_DIRECTION_PENALTY = 0.12
+    SCALE_PREMATURE_BACK_JUMP_PENALTY = 0.08
+    SCALE_EMERGENCY_BACK_DIVE_BONUS = 0.12
+    SCALE_WELL_PREPARED_IDLE_BONUS = 0.05
+    SCALE_IDLE_UNDER_PRESSURE_PENALTY = 0.16
+    SCALE_RECKLESS_FORWARD_PENALTY = 0.12
+    SCALE_OPPONENT_DIVE_BONUS = 0.00
+    SCALE_OPPONENT_SPIKE_PENALTY = 0.10
+    SCALE_POSITION_ALIGNMENT_REWARD = 0.16
+    SCALE_STANDBY_OVERFRONT_PENALTY = 0.12
+    SCALE_STANDBY_OVERBACK_PENALTY = 0.08
+    SCALE_IDLE_FAR_PENALTY = 0.14
+    SCALE_SCORE_SPEED_BONUS = 0.45
+    SCALE_QUICK_LOSS_PENALTY = 0.70
+    RALLY_SPEED_REFERENCE_FRAMES = 180.0
+    SCALE_MATCH_WIN_BONUS = 20.0
 
     reward = 0.0
     reward += SCALE_POINT_SCORE_REWARD * mat["point_scored"]
     reward -= SCALE_POINT_LOST_PENALTY * mat["point_lost"]
-    reward += SCALE_SELF_SPIKE_BONUS * mat["self_spike_used"]
-    reward += SCALE_SELF_DIVE_BONUS * mat["self_dive_used"]
+    reward += SCALE_SELF_TOUCH_BONUS * mat["self_touched_ball"]
+    reward += SCALE_SELF_SPIKE_BONUS * mat["self_spike_used"] * mat["self_touched_ball"]
+    reward += SCALE_SELF_DIVE_BONUS * mat["self_dive_used"] * mat["self_touched_ball"]
+    reward -= SCALE_SELF_DIVE_MISS_PENALTY * mat["self_dive_missed"]
+    reward -= SCALE_SELF_OVERCHASE_PENALTY * mat["self_overchase"]
+    reward += SCALE_SELF_RECOVER_BONUS * mat["self_recover"]
+    reward += (
+        SCALE_DEFENSIVE_TOUCH_BONUS
+        * mat["defensive_touch"]
+        * (0.55 + (0.45 * mat["landing_urgency"]))
+    )
+    reward += SCALE_STABLE_DEFENSE_BONUS * mat["stable_defense_touch"]
+    reward -= SCALE_NEUTRAL_KEEP_PLAY_PENALTY * mat["neutral_keep_play_touch"]
+    reward += SCALE_ASSERTIVE_ATTACK_BONUS * mat["assertive_attack_touch"]
+    reward += (
+        SCALE_ANTICIPATION_BACKWARD_BONUS
+        * mat["timely_backward_move"]
+        * (0.55 + (0.45 * mat["landing_urgency"]))
+    )
+    reward += (
+        SCALE_ANTICIPATION_FORWARD_BONUS
+        * mat["timely_forward_move"]
+        * (0.55 + (0.45 * mat["landing_urgency"]))
+    )
+    reward += (
+        SCALE_GROUNDED_TIMELY_MOVE_BONUS
+        * mat["grounded_timed_move"]
+        * (0.60 + (0.40 * mat["landing_urgency"]))
+    )
+    reward += (
+        SCALE_JUMP_TIMED_TOUCH_BONUS
+        * mat["jump_timed_touch"]
+        * (0.50 + (0.50 * mat["landing_urgency"]))
+    )
+    reward -= (
+        SCALE_WRONG_DIRECTION_PENALTY
+        * mat["wrong_way_move"]
+        * (0.50 + (0.50 * mat["landing_urgency"]))
+    )
+    reward -= (
+        SCALE_PREMATURE_JUMP_PENALTY
+        * mat["premature_jump"]
+        * (0.70 + (0.30 * (1.0 - mat["landing_urgency"])))
+    )
+    reward -= (
+        SCALE_WRONG_JUMP_DIRECTION_PENALTY
+        * mat["wrong_jump_direction"]
+        * (0.60 + (0.40 * mat["landing_urgency"]))
+    )
+    reward -= SCALE_PREMATURE_BACK_JUMP_PENALTY * mat["premature_back_jump"]
+    reward += SCALE_EMERGENCY_BACK_DIVE_BONUS * mat["emergency_back_dive"]
+    reward += SCALE_WELL_PREPARED_IDLE_BONUS * mat["well_prepared_idle"]
+    reward -= (
+        SCALE_IDLE_UNDER_PRESSURE_PENALTY
+        * mat["idle_under_pressure"]
+        * (0.55 + (0.45 * mat["landing_urgency"]))
+    )
+    reward -= SCALE_RECKLESS_FORWARD_PENALTY * mat["reckless_forward_under_pressure"]
     reward += SCALE_OPPONENT_DIVE_BONUS * mat["opponent_dive_used"]
     reward -= SCALE_OPPONENT_SPIKE_PENALTY * mat["opponent_spike_used"]
+    position_alignment = 1.0 - normalize_minmax(
+        mat["position_error"],
+        0,
+        GROUND_HALF_WIDTH,
+    )
+    centered_position_alignment = (position_alignment - 0.5) * 2.0
+    reward += SCALE_POSITION_ALIGNMENT_REWARD * centered_position_alignment
+    reward -= SCALE_STANDBY_OVERFRONT_PENALTY * mat["self_overfront"]
+    reward -= SCALE_STANDBY_OVERBACK_PENALTY * mat["self_overback"]
 
-    rally_reward = 0.0
+    if (
+        mat["ball_on_self_side"] > 0.5
+        and mat["self_touched_ball"] < 0.5
+        and mat["position_error"] > (GROUND_HALF_WIDTH * 0.45)
+    ):
+        reward -= SCALE_IDLE_FAR_PENALTY
+
     if mat["point_scored"] > 0.5:
-        rally_reward = min(
-            mat["rally_total_frames_until_point"] * SCALE_RALLY_FRAME,
-            SCALE_RALLY_FRAME_MAX,
+        score_speed_factor = 1.0 - normalize_minmax(
+            mat["rally_total_frames_until_point"],
+            0.0,
+            RALLY_SPEED_REFERENCE_FRAMES,
         )
-    reward += rally_reward
+        reward += SCALE_SCORE_SPEED_BONUS * score_speed_factor
+    elif mat["point_lost"] > 0.5:
+        quick_loss_factor = 1.0 - normalize_minmax(
+            mat["rally_total_frames_until_point"],
+            0.0,
+            RALLY_SPEED_REFERENCE_FRAMES,
+        )
+        reward -= SCALE_QUICK_LOSS_PENALTY * quick_loss_factor
 
     reward += SCALE_MATCH_WIN_BONUS * mat["match_won"]
     return reward

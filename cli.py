@@ -7,6 +7,20 @@ import importlib
 import _10_config
 
 
+def str_to_bool(value):
+    """Parse common truthy/falsy strings for CLI flags."""
+    if isinstance(value, bool):
+        return value
+    normalized = str(value).strip().lower()
+    if normalized in ("1", "true", "t", "yes", "y", "on"):
+        return True
+    if normalized in ("0", "false", "f", "no", "n", "off"):
+        return False
+    raise argparse.ArgumentTypeError(
+        f"Invalid boolean value: {value}. Use one of true/false, 1/0, yes/no."
+    )
+
+
 def build_parser(conf):
     """====================================================================================================
     ## Design of Parser for CLI
@@ -33,20 +47,52 @@ def build_parser(conf):
     # - Train Side
     parser.add_argument('--train_side', type=str, required=False)
 
+    # - Train Side Mode
+    parser.add_argument('--train_side_mode', '--train-side-mode',
+                        dest='train_side_mode', type=str, required=False)
+    parser.add_argument('--train_num_workers', '--train-num-workers',
+                        dest='train_num_workers', type=int, required=False)
+
     # - Train Opponent
     parser.add_argument('--train_opponent', type=str, required=False)
 
     # - Rewrite Existing Policy
-    parser.add_argument('--train_rewrite', type=bool, required=False)
+    parser.add_argument('--train_rewrite', '--train-rewrite',
+                        dest='train_rewrite', type=str_to_bool, required=False)
+    
+    # - Reset Epsilon While Keeping Existing Policy/State
+    parser.add_argument('--reset_epsilon', '--reset-epsilon',
+                        dest='reset_epsilon', type=str_to_bool, required=False)
+    
+    # - Snapshot Update Interval for Self-Play Opponent
+    parser.add_argument('--self_play_snapshot_interval', '--self-play-snapshot-interval',
+                        dest='self_play_snapshot_interval', type=int, required=False)
+    parser.add_argument('--self_play_pool_enabled', '--self-play-pool-enabled',
+                        dest='self_play_pool_enabled', type=str_to_bool, required=False)
+    parser.add_argument('--self_play_pool_size', '--self-play-pool-size',
+                        dest='self_play_pool_size', type=int, required=False)
+    parser.add_argument('--self_play_pool_latest_prob', '--self-play-pool-latest-prob',
+                        dest='self_play_pool_latest_prob', type=float, required=False)
+    parser.add_argument('--self_play_pool_resample_interval', '--self-play-pool-resample-interval',
+                        dest='self_play_pool_resample_interval', type=int, required=False)
+    parser.add_argument('--self_play_pool_warmup_episode', '--self-play-pool-warmup-episode',
+                        dest='self_play_pool_warmup_episode', type=int, required=False)
+    parser.add_argument('--self_play_rule_mix_prob', '--self-play-rule-mix-prob',
+                        dest='self_play_rule_mix_prob', type=float, required=False)
 
     # - Target Score Selection
     parser.add_argument('--target_score', type=int, required=False)
 
+    parser.add_argument('--curriculum_enabled', '--curriculum-enabled',
+                        dest='curriculum_enabled', type=str_to_bool, required=False)
+    parser.add_argument('--curriculum_schedule', '--curriculum-schedule',
+                        dest='curriculum_schedule', type=str, required=False)
     # - Train Episode
     parser.add_argument('--num_episode', type=int, required=False)
 
     # - Random Serve
-    parser.add_argument('--random_serve', type=bool, required=False)
+    parser.add_argument('--random_serve', '--random-serve',
+                        dest='random_serve', type=str_to_bool, required=False)
 
     # - Random Seed for Reproducibility
     parser.add_argument('--seed', type=int, required=False)
@@ -97,6 +143,10 @@ def parse_args(conf_default, args):
     # - Parse Train Side
     if args.train_side is not None:
         conf_parsed.train_side = args.train_side
+    if args.train_side_mode is not None:
+        conf_parsed.train_side_mode = args.train_side_mode
+    if args.train_num_workers is not None:
+        conf_parsed.train_num_workers = args.train_num_workers
 
     # - Train Opponent
     if args.train_opponent is not None:
@@ -105,10 +155,35 @@ def parse_args(conf_default, args):
     # - Parse Train Rewrite
     if args.train_rewrite is not None:
         conf_parsed.train_rewrite = args.train_rewrite
+    
+    # - Parse Reset Epsilon
+    if args.reset_epsilon is not None:
+        conf_parsed.reset_epsilon = args.reset_epsilon
+    
+    # - Parse Self-Play Snapshot Interval
+    if args.self_play_snapshot_interval is not None:
+        conf_parsed.self_play_snapshot_interval = args.self_play_snapshot_interval
+    if args.self_play_pool_enabled is not None:
+        conf_parsed.self_play_pool_enabled = args.self_play_pool_enabled
+    if args.self_play_pool_size is not None:
+        conf_parsed.self_play_pool_size = args.self_play_pool_size
+    if args.self_play_pool_latest_prob is not None:
+        conf_parsed.self_play_pool_latest_prob = args.self_play_pool_latest_prob
+    if args.self_play_pool_resample_interval is not None:
+        conf_parsed.self_play_pool_resample_interval = args.self_play_pool_resample_interval
+    if args.self_play_pool_warmup_episode is not None:
+        conf_parsed.self_play_pool_warmup_episode = args.self_play_pool_warmup_episode
+    if args.self_play_rule_mix_prob is not None:
+        conf_parsed.self_play_rule_mix_prob = args.self_play_rule_mix_prob
 
     # - Train Episode
     if args.num_episode is not None:
         conf_parsed.num_episode = args.num_episode
+
+    if args.curriculum_enabled is not None:
+        conf_parsed.curriculum_enabled = args.curriculum_enabled
+    if args.curriculum_schedule is not None:
+        conf_parsed.curriculum_schedule = args.curriculum_schedule
 
     # - Parse the Random Serve
     if args.random_serve is not None:

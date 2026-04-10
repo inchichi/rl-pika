@@ -1,4 +1,6 @@
 # Import Required Internal Modules
+from pathlib import Path
+
 import _00_environment
 import _20_model
 
@@ -69,6 +71,49 @@ def create_invironment_instance(conf):
     return env
 
 
+def resolve_policy_name_for_play(conf, algorithm, policy_name):
+    if policy_name is None:
+        return None
+
+    normalized_policy_name = str(policy_name).strip()
+    if normalized_policy_name == "":
+        return None
+    if "/" in normalized_policy_name or "\\" in normalized_policy_name:
+        return normalized_policy_name
+
+    try:
+        policy_dir = Path(_20_model.get_model_policy_dir(conf, algorithm))
+    except Exception:
+        return normalized_policy_name
+
+    candidate_matches = []
+    for pattern in (
+        f"{normalized_policy_name}.pth",
+        f"{normalized_policy_name}.json",
+        f"{normalized_policy_name}.pkl",
+        f"**/{normalized_policy_name}.pth",
+        f"**/{normalized_policy_name}.json",
+        f"**/{normalized_policy_name}.pkl",
+    ):
+        candidate_matches.extend(policy_dir.glob(pattern))
+
+    deduped_matches = []
+    seen_paths = set()
+    for match_path in candidate_matches:
+        resolved = str(match_path.resolve())
+        if resolved in seen_paths:
+            continue
+        seen_paths.add(resolved)
+        deduped_matches.append(match_path)
+
+    if len(deduped_matches) == 1:
+        matched_path = deduped_matches[0]
+        relative_without_suffix = matched_path.relative_to(policy_dir).with_suffix("")
+        return relative_without_suffix.as_posix()
+
+    return normalized_policy_name
+
+
 def load_model(conf, player):
     """====================================================================================================
     ## Loading Policy for Each Player
@@ -76,6 +121,7 @@ def load_model(conf, player):
     # - Check Algorithm and Policy Name for Each Player
     ALGORITHM = conf.algorithm_1p if player == '1p' else conf.algorithm_2p
     POLICY_NAME = conf.policy_1p if player == '1p' else conf.policy_2p
+    POLICY_NAME = resolve_policy_name_for_play(conf, ALGORITHM, POLICY_NAME)
 
     # - Load Selected Policy for Each Player
     if ALGORITHM == 'human':

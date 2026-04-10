@@ -10,7 +10,7 @@ class Config:
         self.mode = ['train', 'play'][1]
 
         # - Set the Target Score
-        self.target_score_train = 3
+        self.target_score_train = 5
         self.target_score_play = 5
 
         # - Set the Algorithm and Policy for Player 1
@@ -30,14 +30,28 @@ class Config:
         # Set the Train Player and Opponent for Training Mode
         self.train_algorithm = 'qlearning'
         self.train_side = ['1p', '2p'][0]
+        self.train_side_mode = None
+        self.train_num_workers = 1
         self.train_rewrite = False
+        self.reset_epsilon = False
+        self.self_play_snapshot_interval = 1000
+        self.self_play_pool_enabled = None
+        self.self_play_pool_size = None
+        self.self_play_pool_latest_prob = None
+        self.self_play_pool_resample_interval = None
+        self.self_play_pool_warmup_episode = None
+        self.self_play_rule_mix_prob = None
         self.train_opponent = 'rule'
         self.train_policy = None
         self.num_episode = 100
 
+        # Training Schedule Options (None means: use algorithm defaults)
+        self.curriculum_enabled = None
+        self.curriculum_schedule = None
+
         # Black & White Mode
         BNW_MODE = True
-        BNW_MODE_PW = 'eklrmklasd'
+        BNW_MODE_PW = '301' #'eklrmklasd'
 
         """====================================================================================================
         ## Configuration for Path

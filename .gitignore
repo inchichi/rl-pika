@@ -1,2 +1,6 @@
 .venv/
-_20_model/**/outputs/policy_trained/
+#_20_model/**/outputs/policy_trained/
+__pycache__/
+*.pyc
+*.pkl
+*.log
