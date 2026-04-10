@@ -33,6 +33,14 @@ def normalize_minmax(value, minimum_value, maximum_value):
     return float(normalized_value)
 
 
+def clamp_unit(value):
+    if value < 0.0:
+        return 0.0
+    if value > 1.0:
+        return 1.0
+    return float(value)
+
+
 def normalize_action_group(action_name):
     normalized_action_name = str(action_name).strip().lower()
 
@@ -77,25 +85,60 @@ def calculate_state_key(materials):
     opponent_action_group = normalize_action_group(
         materials["opponent_action_name"])
 
-    ball_x, ball_y = materials["ball_position"]
-    ball_x = normalize_minmax(float(ball_x), 0, GROUND_WIDTH - 1)
-    ball_y = normalize_minmax(float(ball_y), 0, BALL_TOUCHING_GROUND_Y_COORD)
+    raw_ball_x, raw_ball_y = materials["ball_position"]
+    ball_x = normalize_minmax(float(raw_ball_x), 0, GROUND_WIDTH - 1)
+    ball_y = normalize_minmax(float(raw_ball_y), 0, BALL_TOUCHING_GROUND_Y_COORD)
 
-    ball_velocity_x, ball_velocity_y = materials["ball_velocity"]
+    raw_ball_velocity_x, raw_ball_velocity_y = materials["ball_velocity"]
     ball_velocity_x = normalize_minmax(
-        float(ball_velocity_x), velocity_min, velocity_max)
+        float(raw_ball_velocity_x), velocity_min, velocity_max)
     ball_velocity_y = normalize_minmax(
-        float(ball_velocity_y), velocity_min, velocity_max)
+        float(raw_ball_velocity_y), velocity_min, velocity_max)
 
-    landing_x = float(materials["expected_landing_x"])
-    landing_x = normalize_minmax(landing_x, 0, GROUND_WIDTH - 1)
+    landing_x_raw = float(materials["expected_landing_x"])
+    landing_x = normalize_minmax(landing_x_raw, 0, GROUND_WIDTH - 1)
+
+    self_side_limit = float(GROUND_WIDTH) * 0.5
+    ball_on_self_side = 1.0 if float(raw_ball_x) <= self_side_limit else 0.0
+    wall_proximity = 1.0 - normalize_minmax(
+        min(max(float(raw_ball_x), 0.0), self_side_limit),
+        0.0,
+        self_side_limit,
+    )
+    landing_wall_proximity = 1.0 - normalize_minmax(
+        min(max(landing_x_raw, 0.0), self_side_limit),
+        0.0,
+        self_side_limit,
+    )
+    wall_approach = normalize_minmax(
+        max(-float(raw_ball_velocity_x), 0.0),
+        0.0,
+        abs(float(velocity_min)),
+    )
+    descent_factor = normalize_minmax(
+        float(raw_ball_velocity_y),
+        velocity_min,
+        velocity_max,
+    )
+    wall_bounce_risk = clamp_unit(
+        ball_on_self_side
+        * (
+            0.45 * wall_proximity * wall_approach
+            + 0.35 * landing_wall_proximity
+            + 0.20 * descent_factor
+        )
+    )
+
+    # Keep the state dimension unchanged for checkpoint compatibility while
+    # injecting a dedicated wall-bounce awareness signal into the context slot.
+    opponent_context = clamp_unit((0.70 * opponent_y) + (0.30 * wall_bounce_risk))
 
     DESIGNED_STATE_VECTOR = [
         self_x,
         self_y,
         self_action_group,
         opponent_x,
-        opponent_y,
+        opponent_context,
         opponent_action_group,
         ball_x,
         ball_y,

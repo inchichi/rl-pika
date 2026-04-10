@@ -552,8 +552,14 @@ def build_worker_opponent_descriptor(opponent, label, train_policy_path):
         policy_path = get_primary_policy_path(opponent)
 
     normalized_label = str(label).strip().lower()
+    worker_policy_path = str(train_policy_path).strip()
     if normalized_label in ("self", "self:latest"):
-        policy_path = str(train_policy_path)
+        if worker_policy_path != "":
+            policy_path = worker_policy_path
+    elif normalized_label.startswith("self:"):
+        if policy_path == "" or not os.path.exists(policy_path):
+            if worker_policy_path != "":
+                policy_path = worker_policy_path
 
     return {
         "kind": "model",
