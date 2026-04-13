@@ -1,8 +1,8 @@
 {
   "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/inchihci.pth",
-  "episodes_completed": 121224,
-  "win_count": 86437,
-  "loss_count": 34774,
-  "draw_count": 13,
+  "episodes_completed": 252105,
+  "win_count": 167113,
+  "loss_count": 83045,
+  "draw_count": 1947,
   "epsilon": null
 }

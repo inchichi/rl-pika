@@ -72,11 +72,14 @@ def select_mat_for_reward(materials):
     predicted_self_landing = int(float(expected_landing_x) <= float(GROUND_HALF_WIDTH))
     landing_delta_x = float(expected_landing_x) - float(self_position[0])
     landing_delta_abs = abs(landing_delta_x)
-    landing_move_threshold = float(GROUND_HALF_WIDTH) * 0.08
-    ready_wait_threshold = float(GROUND_HALF_WIDTH) * 0.10
+    landing_move_threshold = float(GROUND_HALF_WIDTH) * 0.10
+    ready_wait_threshold = float(GROUND_HALF_WIDTH) * 0.13
+    micro_adjust_threshold = float(GROUND_HALF_WIDTH) * 0.05
 
+    ball_velocity_x = 0.0
     ball_velocity_y = 0.0
     if isinstance(ball_velocity, (list, tuple)) and len(ball_velocity) >= 2:
+        ball_velocity_x = float(ball_velocity[0])
         ball_velocity_y = float(ball_velocity[1])
 
     self_forward_commit = int(
@@ -212,12 +215,21 @@ def select_mat_for_reward(materials):
         predicted_self_landing > 0
         and float(expected_landing_x) <= float(GROUND_HALF_WIDTH) * 0.16
     )
+    serve_setup_like = int(
+        ball_on_self_side > 0
+        and float(self_position[0]) <= float(GROUND_HALF_WIDTH) * 0.18
+        and float(expected_landing_x) <= float(GROUND_HALF_WIDTH) * 0.16
+        and ball_to_self_distance <= float(GROUND_HALF_WIDTH) * 0.07
+        and opponent_spike_used < 1
+        and landing_urgency < 0.58
+    )
     wall_ball_approaching = int(
         float(ball_position[0]) <= float(GROUND_HALF_WIDTH) * 0.24
         and ball_velocity_y > 0.0
     )
     wall_bounce_pressure = int(
         wall_corner_target > 0
+        and serve_setup_like < 1
         and (wall_ball_approaching > 0 or landing_urgency > 0.42)
     )
     back_save_move = int(
@@ -225,7 +237,9 @@ def select_mat_for_reward(materials):
         and self_action_name in ("backward", "jump_backward", "dive_backward")
     )
     back_save_dive = int(
-        back_defense_pressure > 0 and self_action_name == "dive_backward"
+        back_defense_pressure > 0
+        and self_action_name == "dive_backward"
+        and landing_urgency > 0.62
     )
     hesitated_back_defense = int(
         back_defense_pressure > 0
@@ -242,7 +256,6 @@ def select_mat_for_reward(materials):
         wall_bounce_pressure > 0
         and self_action_name in ("idle", "forward", "jump_forward", "dive_forward")
     )
-
     premature_back_jump = int(
         self_backward_jump > 0
         and landing_need_backward < 1
@@ -253,6 +266,63 @@ def select_mat_for_reward(materials):
         self_backward_dive > 0
         and landing_need_backward > 0
         and landing_urgency > 0.72
+    )
+    urgent_dive_context = int(
+        front_save_dive > 0
+        or back_save_dive > 0
+        or wall_bounce_read_dive > 0
+        or emergency_back_dive > 0
+    )
+    unnecessary_back_dive = int(
+        self_backward_dive > 0
+        and back_defense_pressure < 1
+        and wall_bounce_pressure < 1
+        and landing_need_backward < 1
+    )
+    non_emergency_back_dive = int(
+        self_backward_dive > 0
+        and wall_bounce_read_dive < 1
+        and emergency_back_dive < 1
+    )
+    passive_back_action = int(
+        defensive_pressure < 1
+        and self_action_name in ("backward", "jump_backward", "dive_backward")
+    )
+    serve_setup_back_dive = int(serve_setup_like > 0 and self_backward_dive > 0)
+    serve_control_phase = int(
+        ball_on_self_side > 0
+        and float(self_position[0]) <= float(GROUND_HALF_WIDTH) * 0.24
+        and ball_to_self_distance <= float(GROUND_HALF_WIDTH) * 0.14
+        and float(ball_position[1]) <= float(BALL_TOUCHING_GROUND_Y_COORD) * 0.22
+        and opponent_spike_used < 1
+    )
+    serve_control_back_action = int(
+        serve_control_phase > 0
+        and self_action_name in ("backward", "jump_backward", "dive_backward")
+    )
+    serve_control_back_dive = int(
+        serve_control_phase > 0 and self_action_name == "dive_backward"
+    )
+    serve_control_ready_action = int(
+        serve_control_phase > 0
+        and self_action_name in ("idle", "forward", "jump_forward", "dive_forward")
+    )
+    controlled_ball_dive = int(
+        self_dive_used > 0
+        and ball_on_self_side > 0
+        and ball_to_self_distance <= float(GROUND_HALF_WIDTH) * 0.10
+        and landing_urgency < 0.64
+        and abs(ball_velocity_x) <= 2.5
+        and opponent_spike_used < 1
+    )
+    unnecessary_dive = int(
+        self_dive_used > 0
+        and urgent_dive_context < 1
+        and (
+            landing_urgency < 0.68
+            or landing_delta_abs <= ready_wait_threshold
+            or defensive_pressure < 1
+        )
     )
     grounded_timed_move = int(
         self_grounded_move > 0
@@ -289,6 +359,15 @@ def select_mat_for_reward(materials):
         and position_error <= ready_wait_threshold
         and landing_urgency > 0.42
     )
+    settled_near_target = int(
+        defensive_pressure > 0 and landing_delta_abs <= ready_wait_threshold
+    )
+    restless_ground_adjust = int(
+        settled_near_target > 0
+        and self_grounded_move > 0
+        and landing_delta_abs <= micro_adjust_threshold
+        and landing_urgency < 0.82
+    )
     idle_under_pressure = int(
         defensive_pressure > 0
         and self_touched_ball < 1
@@ -304,6 +383,9 @@ def select_mat_for_reward(materials):
     attacking_opportunity = int(
         defensive_pressure < 1
         and float(ball_position[1]) < float(BALL_TOUCHING_GROUND_Y_COORD) * 0.72
+    )
+    assertive_attack_action = int(
+        self_aggressive_attack > 0 and attacking_opportunity > 0
     )
     assertive_attack_touch = int(
         self_touched_ball > 0
@@ -359,6 +441,15 @@ def select_mat_for_reward(materials):
         "landing_urgency": landing_urgency,
         "premature_back_jump": premature_back_jump,
         "emergency_back_dive": emergency_back_dive,
+        "unnecessary_back_dive": unnecessary_back_dive,
+        "non_emergency_back_dive": non_emergency_back_dive,
+        "passive_back_action": passive_back_action,
+        "serve_setup_back_dive": serve_setup_back_dive,
+        "serve_control_back_action": serve_control_back_action,
+        "serve_control_back_dive": serve_control_back_dive,
+        "serve_control_ready_action": serve_control_ready_action,
+        "controlled_ball_dive": controlled_ball_dive,
+        "unnecessary_dive": unnecessary_dive,
         "position_target_x": position_target_x,
         "position_error": position_error,
         "self_overfront": self_overfront,
@@ -369,8 +460,11 @@ def select_mat_for_reward(materials):
         "defensive_touch": defensive_touch,
         "stable_defense_touch": stable_defense_touch,
         "neutral_keep_play_touch": neutral_keep_play_touch,
+        "assertive_attack_action": assertive_attack_action,
         "assertive_attack_touch": assertive_attack_touch,
         "well_prepared_idle": well_prepared_idle,
+        "settled_near_target": settled_near_target,
+        "restless_ground_adjust": restless_ground_adjust,
         "idle_under_pressure": idle_under_pressure,
         "reckless_forward_under_pressure": reckless_forward_under_pressure,
         "rally_total_frames_until_point": rally_total_frames_until_point,
@@ -395,18 +489,29 @@ def calculate_reward(materials):
     SCALE_FRONT_SAVE_DIVE_BONUS = 0.11
     SCALE_HESITATION_FRONT_PENALTY = 0.16
     SCALE_BACK_SAVE_MOVE_BONUS = 0.18
-    SCALE_BACK_SAVE_DIVE_BONUS = 0.14
+    SCALE_BACK_SAVE_DIVE_BONUS = 0.11
     SCALE_HESITATION_BACK_PENALTY = 0.18
     SCALE_WALL_BOUNCE_READ_BONUS = 0.16
-    SCALE_WALL_BOUNCE_DIVE_BONUS = 0.14
+    SCALE_WALL_BOUNCE_DIVE_BONUS = 0.08
     SCALE_WALL_BOUNCE_HESITATION_PENALTY = 0.18
     SCALE_GROUNDED_TIMELY_MOVE_BONUS = 0.11
     SCALE_WRONG_DIRECTION_PENALTY = 0.14
     SCALE_PREMATURE_JUMP_PENALTY = 0.10
     SCALE_WRONG_JUMP_DIRECTION_PENALTY = 0.12
     SCALE_PREMATURE_BACK_JUMP_PENALTY = 0.08
-    SCALE_EMERGENCY_BACK_DIVE_BONUS = 0.12
+    SCALE_EMERGENCY_BACK_DIVE_BONUS = 0.10
+    SCALE_UNNECESSARY_BACK_DIVE_PENALTY = 0.12
+    SCALE_NON_EMERGENCY_BACK_DIVE_PENALTY = 0.08
+    SCALE_PASSIVE_BACK_ACTION_PENALTY = 0.08
+    SCALE_SERVE_SETUP_BACK_DIVE_PENALTY = 0.20
+    SCALE_SERVE_CONTROL_BACK_ACTION_PENALTY = 0.12
+    SCALE_SERVE_CONTROL_BACK_DIVE_PENALTY = 0.36
+    SCALE_SERVE_CONTROL_READY_BONUS = 0.08
+    SCALE_CONTROLLED_BALL_DIVE_PENALTY = 0.24
+    SCALE_UNNECESSARY_DIVE_PENALTY = 0.14
+    SCALE_ASSERTIVE_ATTACK_ACTION_BONUS = 0.12
     SCALE_WELL_PREPARED_IDLE_BONUS = 0.05
+    SCALE_RESTLESS_GROUND_ADJUST_PENALTY = 0.06
     SCALE_IDLE_UNDER_PRESSURE_PENALTY = 0.16
     SCALE_RECKLESS_FORWARD_PENALTY = 0.12
     SCALE_OPPONENT_DIVE_BONUS = 0.00
@@ -503,7 +608,38 @@ def calculate_reward(materials):
     )
     reward -= SCALE_PREMATURE_BACK_JUMP_PENALTY * mat["premature_back_jump"]
     reward += SCALE_EMERGENCY_BACK_DIVE_BONUS * mat["emergency_back_dive"]
+    reward -= (
+        SCALE_UNNECESSARY_BACK_DIVE_PENALTY
+        * mat["unnecessary_back_dive"]
+        * (0.70 + (0.30 * (1.0 - mat["landing_urgency"])))
+    )
+    reward -= (
+        SCALE_NON_EMERGENCY_BACK_DIVE_PENALTY
+        * mat["non_emergency_back_dive"]
+        * (0.65 + (0.35 * (1.0 - mat["landing_urgency"])))
+    )
+    reward -= SCALE_PASSIVE_BACK_ACTION_PENALTY * mat["passive_back_action"]
+    reward -= SCALE_SERVE_SETUP_BACK_DIVE_PENALTY * mat["serve_setup_back_dive"]
+    reward -= SCALE_SERVE_CONTROL_BACK_ACTION_PENALTY * mat["serve_control_back_action"]
+    reward -= SCALE_SERVE_CONTROL_BACK_DIVE_PENALTY * mat["serve_control_back_dive"]
+    reward += SCALE_SERVE_CONTROL_READY_BONUS * mat["serve_control_ready_action"]
+    reward -= (
+        SCALE_CONTROLLED_BALL_DIVE_PENALTY
+        * mat["controlled_ball_dive"]
+        * (0.80 + (0.20 * (1.0 - mat["landing_urgency"])))
+    )
+    reward -= (
+        SCALE_UNNECESSARY_DIVE_PENALTY
+        * mat["unnecessary_dive"]
+        * (0.75 + (0.25 * (1.0 - mat["landing_urgency"])))
+    )
+    reward += SCALE_ASSERTIVE_ATTACK_ACTION_BONUS * mat["assertive_attack_action"]
     reward += SCALE_WELL_PREPARED_IDLE_BONUS * mat["well_prepared_idle"]
+    reward -= (
+        SCALE_RESTLESS_GROUND_ADJUST_PENALTY
+        * mat["restless_ground_adjust"]
+        * (1.00 - (0.35 * mat["landing_urgency"]))
+    )
     reward -= (
         SCALE_IDLE_UNDER_PRESSURE_PENALTY
         * mat["idle_under_pressure"]
@@ -517,7 +653,10 @@ def calculate_reward(materials):
         0,
         GROUND_HALF_WIDTH,
     )
-    centered_position_alignment = (position_alignment - 0.5) * 2.0
+    if mat["settled_near_target"] > 0:
+        centered_position_alignment = 1.0
+    else:
+        centered_position_alignment = (position_alignment - 0.5) * 2.0
     reward += SCALE_POSITION_ALIGNMENT_REWARD * centered_position_alignment
     reward -= SCALE_STANDBY_OVERFRONT_PENALTY * mat["self_overfront"]
     reward -= SCALE_STANDBY_OVERBACK_PENALTY * mat["self_overback"]

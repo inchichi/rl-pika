@@ -38,7 +38,7 @@ def get_train_params():
         "train_num_workers": 1,
         "self_play_snapshot_interval": 2000,
         "self_play_pool_enabled": True,
-        "self_play_pool_size": 24,
+        "self_play_pool_size": 32,
         "self_play_pool_latest_prob": 0.35,
         "self_play_pool_resample_interval": 25,
         "self_play_pool_warmup_episode": 10000,

@@ -1,122 +1,162 @@
 [
   {
-    "episode": 76000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep76000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep76000_critic.pth"
+    "episode": 190000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep190000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep190000_critic.pth"
   },
   {
-    "episode": 78000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep78000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep78000_critic.pth"
+    "episode": 192000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep192000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep192000_critic.pth"
   },
   {
-    "episode": 80000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep80000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep80000_critic.pth"
+    "episode": 194000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep194000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep194000_critic.pth"
   },
   {
-    "episode": 82000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep82000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep82000_critic.pth"
+    "episode": 196000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep196000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep196000_critic.pth"
   },
   {
-    "episode": 84000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep84000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep84000_critic.pth"
+    "episode": 198000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep198000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep198000_critic.pth"
   },
   {
-    "episode": 86000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep86000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep86000_critic.pth"
+    "episode": 200000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep200000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep200000_critic.pth"
   },
   {
-    "episode": 88000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep88000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep88000_critic.pth"
+    "episode": 202000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep202000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep202000_critic.pth"
   },
   {
-    "episode": 90000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep90000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep90000_critic.pth"
+    "episode": 204000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep204000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep204000_critic.pth"
   },
   {
-    "episode": 92000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep92000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep92000_critic.pth"
+    "episode": 206000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep206000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep206000_critic.pth"
   },
   {
-    "episode": 94000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep94000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep94000_critic.pth"
+    "episode": 208000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep208000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep208000_critic.pth"
   },
   {
-    "episode": 96000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep96000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep96000_critic.pth"
+    "episode": 210000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep210000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep210000_critic.pth"
   },
   {
-    "episode": 98000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep98000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep98000_critic.pth"
+    "episode": 212000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep212000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep212000_critic.pth"
   },
   {
-    "episode": 100000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep100000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep100000_critic.pth"
+    "episode": 214000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep214000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep214000_critic.pth"
   },
   {
-    "episode": 102000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep102000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep102000_critic.pth"
+    "episode": 216000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep216000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep216000_critic.pth"
   },
   {
-    "episode": 104000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep104000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep104000_critic.pth"
+    "episode": 218000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep218000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep218000_critic.pth"
   },
   {
-    "episode": 106000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep106000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep106000_critic.pth"
+    "episode": 220000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep220000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep220000_critic.pth"
   },
   {
-    "episode": 108000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep108000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep108000_critic.pth"
+    "episode": 222000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep222000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep222000_critic.pth"
   },
   {
-    "episode": 110000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep110000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep110000_critic.pth"
+    "episode": 224000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep224000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep224000_critic.pth"
   },
   {
-    "episode": 112000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep112000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep112000_critic.pth"
+    "episode": 226000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep226000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep226000_critic.pth"
   },
   {
-    "episode": 114000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep114000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep114000_critic.pth"
+    "episode": 228000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep228000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep228000_critic.pth"
   },
   {
-    "episode": 116000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep116000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep116000_critic.pth"
+    "episode": 230000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep230000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep230000_critic.pth"
   },
   {
-    "episode": 118000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep118000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep118000_critic.pth"
+    "episode": 232000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep232000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep232000_critic.pth"
   },
   {
-    "episode": 120000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep120000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep120000_critic.pth"
+    "episode": 234000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep234000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep234000_critic.pth"
   },
   {
-    "episode": 122000,
-    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep122000.pth",
-    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep122000_critic.pth"
+    "episode": 236000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep236000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep236000_critic.pth"
+  },
+  {
+    "episode": 238000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep238000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep238000_critic.pth"
+  },
+  {
+    "episode": 240000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep240000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep240000_critic.pth"
+  },
+  {
+    "episode": 242000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep242000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep242000_critic.pth"
+  },
+  {
+    "episode": 244000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep244000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep244000_critic.pth"
+  },
+  {
+    "episode": 246000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep246000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep246000_critic.pth"
+  },
+  {
+    "episode": 248000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep248000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep248000_critic.pth"
+  },
+  {
+    "episode": 250000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep250000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep250000_critic.pth"
+  },
+  {
+    "episode": 252000,
+    "policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep252000.pth",
+    "secondary_policy_path": "/home/ms990728/works/rl-pika-v1/_20_model/ppo/outputs/policy_trained/_self_play_pool/inchihci/inchihci_sp_ep252000_critic.pth"
   }
 ]
